@@ -45,12 +45,20 @@ def c_2_n(c):
 
 
 class TentoN(Scene):
+    def __init__(self,number,base,animate=True,bg=None,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        super().__init__(
+                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B10_to_B{base}"},
+                   camera_config={"background_color":bg if bg else BLACK},
+                   **kwargs)
+        
     def construct(self):
         up_buf=.15
-        dev=2
-        origin_num=251291
-        number=origin_num
-        animate=False
+        base=self.base
+        number=self.number
+        animate=self.animate
         i=0
         main_group=VGroup()
         while number > 0:
@@ -61,15 +69,15 @@ class TentoN(Scene):
             else:
                 tex_num=group1[-2]
                 v_line=Line(group1[-3].get_end(),group1[-3].get_end()+DOWN*.6)
-            
-            str_dev=str(dev)
+
+            str_dev=str(base)
             devider=Tex(str_dev).next_to(v_line)
 
-            str_val=str(int(number/dev))
-            val=Tex(str_val).move_to(devider.get_right()+DOWN*.6)
+            str_val=str(int(number/base))
+            val=Tex(str_val).move_to(devider.get_center()+DOWN*.6)
             
             h_line=Line(v_line.get_end(),v_line.get_end()+(max(val.get_width(),1))*RIGHT)
-            str_rest=n_2_c(number%dev)
+            str_rest=n_2_c(number%base)
             rest=Tex(str_rest).move_to(tex_num.get_bottom()+DOWN*.4)
             if i==0:
                 group1=VGroup(tex_num,v_line,devider,h_line,val,rest)
@@ -106,7 +114,7 @@ class TentoN(Scene):
         arrow=Arrow(main_group[-1][-1].get_bottom()+LEFT*(r+1),main_group[r][-1].get_left()+LEFT*(r+1))
         self.add(arrow) if not animate else self.play(ShowCreation(arrow))
 
-        result=VGroup(Tex(f"({origin_num})_{{10}}"),Tex("="),VGroup(Tex("("))
+        result=VGroup(Tex(f"({self.number})_{{10}}"),Tex("="),VGroup(Tex("("))
                       ).arrange(RIGHT).next_to(main_group[0]).shift(RIGHT*3)
         self.add(result)
         buff=.2
@@ -123,21 +131,30 @@ class TentoN(Scene):
                 self.add(res)
             result[-1].add(res)
             buff+=.15
-        closing=Tex(f")_{{{dev}}}").move_to(result[2].get_center()+RIGHT*(buff+0.15))
+        closing=Tex(f")_{{{base}}}").move_to(result[2].get_center()+RIGHT*(buff+0.15))
         result.add(closing)
 
         if animate:
             self.play(FadeOut(main_group),FadeOut(VGroup(arrow,boxes)))
             frame=self.frame
             self.play(result.animate.move_to(ORIGIN),frame.animate.move_to(ORIGIN))
-            
+        self.wait(2)
         # self.embed()
         
 class NtoTen(Scene):
+    def __init__(self,number,base,animate=True,bg=None,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        super().__init__(
+                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B10_to_B{base}"},
+                   camera_config={"background_color":bg if bg else BLACK},
+                   **kwargs)
+        
     def construct(self):
-        num="FACEB00C"
-        base=16
-        animate=True
+        num=str(self.number)
+        base=self.base
+        animate=self.animate
         n=len(num)
         num_group=VGroup(*[Tex(c) for c in num]).arrange(RIGHT).shift(UP*2)
         indecies=VGroup(*[Tex(f'{i}',fill_color=BLUE,fill_opacity=.5).move_to(num_group[n-i-1].get_top()+UP*.4).scale(.8) for i in range(n)])
@@ -210,4 +227,28 @@ class NtoTen(Scene):
             
         else:
             self.add(equation,equation2,equation3,summ,result) 
-        # self.add(equation,equation2,equation3,summ,result) 
+            self.wait(2)
+
+
+def convert_base10_to_n(num,base,animation=True,bg=None):
+    scene = TentoN(num,base,animate=animation,bg=bg)
+    scene.run()
+    if not animation:
+        import os
+        if not os.path.exists("images"):
+            os.makedirs("images")
+        scene.get_image().save(f"images/{num}-B10_to_B{base}.png")
+    
+def convert_n_to_base10(num,base,animation=True,bg=None):
+    scene = NtoTen(num,base,animate=animation,bg=bg)
+    scene.run()
+    if not animation:
+        import os
+        if not os.path.exists("images"):
+            os.makedirs("images")
+        scene.get_image().save(f"images/{num}-B{base}_to_B10.png")
+
+
+if __name__ == "__main__":
+    convert_base10_to_n(25509,2,animation=False)
+    convert_n_to_base10('FF71',16,animation=False)
