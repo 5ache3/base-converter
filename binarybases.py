@@ -120,20 +120,8 @@ class Frombase2(Scene):
             self.add(main_result)
             self.wait()
 
-class Tobase2(Scene):
-
-    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
-        self.number=number
-        self.base=base
-        self.animate=animate
-        self.show_table=show_table
-        super().__init__(
-                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{base}_to_B2"},
-                   camera_config={"background_color":bg if bg else BLACK},
-                   **kwargs)
-        
-    def construct(self):
-        table=VGroup(
+def get_table_and_box():
+    table=VGroup(
         Text("nombres en binaire :"),
         VGroup(Tex("0"),Tex("="),Tex("0000")).arrange(RIGHT*1.25),
         VGroup(Tex("1"),Tex("="),Tex("0001")).arrange(RIGHT*1.25),
@@ -152,7 +140,23 @@ class Tobase2(Scene):
         VGroup(Tex("E"),Tex("="),Tex("1110")).arrange(RIGHT*1.25),
         VGroup(Tex("F"),Tex("="),Tex("1111")).arrange(RIGHT*1.25),
     ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
-        box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
+    box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
+
+    return table,box
+class Tobase2(Scene):
+    
+    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        self.show_table=show_table
+        super().__init__(
+                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{base}_to_B2"},
+                   camera_config={"background_color":bg if bg else BLACK},
+                   **kwargs)
+        
+    def construct(self):
+        
 
         base=self.base
         number=self.number
@@ -161,7 +165,7 @@ class Tobase2(Scene):
 
         num_str=str(number)
         n=len(num_str)
-
+        table,box=get_table_and_box()
         if base not in [2,4,8,16]:
             raise ValueError("Base must be one of 2,4,8,16")
         
@@ -198,6 +202,77 @@ class Tobase2(Scene):
         else:
             self.add(number_tex,buffed_num,bin_num,result)
             self.wait()
+
+
+class InterBase2(Scene):
+
+    # def __init__(self,number,str_base,end_base,animate=True,show_table=True,bg=None,**kwargs):
+    #     self.number=number
+    #     self.str_base=str_base
+    #     self.end_base=end_base
+    #     self.animate=animate
+    #     self.show_table=show_table
+    #     super().__init__(
+    #                 file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{str_base}_to_B{end_base}"},
+    #                 camera_config={"background_color":bg if bg else BLACK},
+    #                 **kwargs)
+   
+    def construct(self):
+        number='62F21'
+        str_base=16
+        end_base=8
+        animate=False
+        show_table=False
+        bf1=.7 if str_base == 8 else .9 if str_base == 16 else .3
+        bf2=.7 if end_base == 8 else .9 if end_base == 16 else .3
+        group_size1={2:1,4:2,8:3,16:4}[str_base]
+        group_size2={2:1,4:2,8:3,16:4}[end_base]
+        if str_base not in [2,4,8,16] or end_base not in [2,4,8,16]:
+            raise ValueError("starting and ending bases must be powers of 2 (2,4,8,16)")
+        
+        str_num=str(number)
+        n=len(str_num)
+        num_tex=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=.1).to_edge(UP).shift(DOWN+LEFT*(animate or show_table))
+        num_tex_sep=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=bf1).next_to(num_tex,DOWN*2)
+        bits=VGroup(*[Tex(binaryrep(get_char_value(str_num[i]),str_base)).next_to(num_tex_sep[i],DOWN) for i in range(n)])
+        bits2=VGroup(*[Tex(c) for c in ''.join([bit.get_string() for bit in bits])]).arrange(RIGHT,buff=.1).next_to(bits,DOWN*2)
+        
+        bits2_sep=VGroup(*[Tex(''.join([bit.get_string() for bit in bits2[::-1][i:i+group_size2]])[::-1]) for i in range(0,len(bits2),group_size2)])[::-1].arrange(RIGHT).move_to(bits2.get_center())
+        
+        target_group=VGroup(*[Tex(get_label_string(bits2_sep[i].get_string())).next_to(bits2_sep[i],DOWN) for i in range(len(bits2_sep))])
+        
+        target=Tex(''.join([c.get_string() for c in target_group]))
+        result=VGroup(
+            VGroup(Tex('('),num_tex.copy(),Tex(f")_{{{str_base}}}")).arrange(RIGHT,buff=.1),
+            Tex("="),
+            VGroup(Tex('('),VGroup(*[Tex(c.get_string()) for c in target_group]).arrange(RIGHT,buff=.1),Tex(f")_{{{end_base}}}")).arrange(RIGHT,buff=.1)
+        ).arrange(RIGHT).next_to(target_group,DOWN*2)
+
+
+        table,box=get_table_and_box()
+        if show_table or animate:
+            self.add(table,box)
+        
+        if animate :
+            self.play(Write(num_tex))
+            self.play(TransformMatchingShapes(num_tex,num_tex_sep))
+            
+            for i in range(len(num_tex_sep)):
+                val=get_char_value(num_tex_sep[i].get_string())
+                self.play(FadeIn(bits[i]),Indicate(num_tex_sep[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
+            self.play(FadeTransform(bits.copy(),bits2_sep))
+            for i in range(len(bits2_sep)):
+                val=get_char_value(target_group[i].get_string())
+                self.play(FadeIn(target_group[i]),Indicate(bits2_sep[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
+            
+            self.play(TransformMatchingShapes(target_group.copy(),result[2][1]),FadeIn(VGroup(result[:2],result[2][0],result[2][2])))
+            if not show_table:
+                self.play(FadeOut(VGroup(box,table)))
+        else:
+            self.add(num_tex,num_tex_sep,bits,bits2_sep,target_group,result)
+
+
+
 
 
 def convert_base2_to_n(num,base,animation=True,show_table=True,bg=None):
