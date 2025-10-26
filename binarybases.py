@@ -21,14 +21,15 @@ def binaryrep(num,base):
         b='0'+b
     return b
 class Frombase2(Scene):
-    # def __init__(self,number,base,animate=True,bg=None,**kwargs):
-    #     self.number=number
-    #     self.base=base
-    #     self.animate=animate
-    #     super().__init__(
-    #                file_writer_config={"write_to_movie":True,"file_name":f"{number}-B2_to_B{base}"},
-    #                camera_config={"background_color":bg if bg else BLACK},
-    #                **kwargs)
+    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        self.show_table=show_table
+        super().__init__(
+                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B2_to_B{base}"},
+                   camera_config={"background_color":bg if bg else BLACK},
+                   **kwargs)
 
 
     def construct(self):
@@ -53,10 +54,10 @@ class Frombase2(Scene):
     ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
         box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
 
-        base=8
-        number=1111101001001
-        animate=False
-        show_table=False
+        base=self.base
+        number=self.number
+        animate=self.animate
+        show_table=self.show_table
 
         if animate or show_table:
             self.add(table,box)
@@ -88,9 +89,9 @@ class Frombase2(Scene):
         result=VGroup(*[c.copy() for c in labels_group]).arrange(RIGHT).next_to(labels_group,DOWN*1.5)
 
         main_result=VGroup(
-            VGroup(Tex("("),bits.copy(),Tex(")_{2}")).arrange(RIGHT)
+            VGroup(Tex("("),bits.copy(),Tex(")_{2}")).arrange(RIGHT,buff=.1)
             ,Tex("="),
-            VGroup(Tex("("),result.copy(),Tex(f")_{{{base}}}")).arrange(RIGHT)
+            VGroup(Tex("("),result.copy(),Tex(f")_{{{base}}}")).arrange(RIGHT,buff=.1)
             ).arrange(RIGHT).move_to(ORIGIN).shift(DOWN*2.5+LEFT)
         
         if animate:
@@ -104,11 +105,13 @@ class Frombase2(Scene):
                 print(val)
                 self.play(FadeIn(labels_group[i]),Indicate(grouped_bits[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
             self.play(TransformMatchingParts(labels_group.copy(),result))
-            self.play(Write(main_result))
+            self.play(TransformMatchingParts(result,main_result[2][1]),FadeIn(VGroup(main_result[:2],main_result[2][0],main_result[2][2])))
+
             if not show_table:
                 self.play(FadeOut(VGroup(table,box)))
-            self.wait(2)
-            self.play(FadeOut(VGroup(grouped_bits,labels_group,result)),main_result.animate.move_to(ORIGIN+LEFT))
+                self.play(FadeOut(VGroup(grouped_bits,labels_group)),main_result.animate.move_to(ORIGIN))
+            else:
+                self.play(FadeOut(VGroup(grouped_bits,labels_group)),main_result.animate.move_to(ORIGIN+LEFT))
 
             
         else:
@@ -118,6 +121,17 @@ class Frombase2(Scene):
             self.wait()
 
 class Tobase2(Scene):
+
+    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        self.show_table=show_table
+        super().__init__(
+                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{base}_to_B2"},
+                   camera_config={"background_color":bg if bg else BLACK},
+                   **kwargs)
+        
     def construct(self):
         table=VGroup(
         Text("nombres en binaire :"),
@@ -140,10 +154,10 @@ class Tobase2(Scene):
     ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
         box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
 
-        base=16
-        number="F4A5"
-        animate=False
-        show_table=True
+        base=self.base
+        number=self.number
+        animate=self.animate
+        show_table=self.show_table
 
         num_str=str(number)
         n=len(num_str)
@@ -173,7 +187,7 @@ class Tobase2(Scene):
             for i in range(n):
                 val=get_char_value(num_str[i])
                 self.play(FadeIn(bin_num[i]),Indicate(buffed_num[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
-            self.play(TransformMatchingParts(bin_num.copy(),result[2][2]),FadeIn(VGroup(result[:2],result[2][0],result[2][-1])))
+            self.play(TransformMatchingParts(bin_num.copy(),result[2][1]),FadeIn(VGroup(result[:2],result[2][0],result[2][-1])))
             
             if not show_table:
                 self.play(FadeOut(VGroup(table,box)))
@@ -186,3 +200,27 @@ class Tobase2(Scene):
             self.wait()
 
 
+def convert_base2_to_n(num,base,animation=True,show_table=True,bg=None):
+    scene = Frombase2(num,base,animate=animation,show_table=show_table,bg=bg)
+    scene.run()
+    if not animation:
+        import os
+        if not os.path.exists("images"):
+            os.makedirs("images")
+        scene.get_image().save(f"images/{num}-B2_to_B{base}.png")
+
+    
+def convert_base_n_to_2(num,base,animation=True,show_table=True,bg=None):
+    scene = Tobase2(num,base,animate=animation,show_table=show_table,bg=bg)
+    scene.run()
+    if not animation:
+        import os
+        if not os.path.exists("images"):
+            os.makedirs("images")
+        scene.get_image().save(f"images/{num}-B{base}_to_B2.png")
+
+
+if __name__=="__main__":
+
+    convert_base2_to_n(100001101,8,animation=True,show_table=False)
+    convert_base_n_to_2("F501",16,show_table=False)
