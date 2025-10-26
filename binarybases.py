@@ -14,6 +14,12 @@ def get_char_value(c):
        'A':10,'B':11,'C':12,'D':13,'E':14,'F':15}
     return d[c]
 
+def binaryrep(num,base):
+    b=str(bin(num))[2:]
+    l=3 if base==8 else 4 if base == 16 else 2
+    while len(b)<l:
+        b='0'+b
+    return b
 class Frombase2(Scene):
     # def __init__(self,number,base,animate=True,bg=None,**kwargs):
     #     self.number=number
@@ -57,12 +63,12 @@ class Frombase2(Scene):
 
         num_str=str(number)
         n=len(num_str)
-
-        bits=VGroup(*[Tex(num_str[i]) for i in range(n)]).arrange(RIGHT,buff=0.1).to_edge(UP).shift(LEFT+DOWN)
-
         if base not in [2,4,8,16]:
             raise ValueError("Base must be one of 2,4,8,16")
         group_size={2:1,4:2,8:3,16:4}[base]
+
+        bits=VGroup(*[Tex(num_str[i]) for i in range(n)]).arrange(RIGHT,buff=0.1).to_edge(UP).shift(LEFT+DOWN)
+
 
         grouped_bits=VGroup()
         for i in range(0,n,group_size):
@@ -111,5 +117,72 @@ class Frombase2(Scene):
             self.add(main_result)
             self.wait()
 
+class Tobase2(Scene):
+    def construct(self):
+        table=VGroup(
+        Text("nombres en binaire :"),
+        VGroup(Tex("0"),Tex("="),Tex("0000")).arrange(RIGHT*1.25),
+        VGroup(Tex("1"),Tex("="),Tex("0001")).arrange(RIGHT*1.25),
+        VGroup(Tex("2"),Tex("="),Tex("0010")).arrange(RIGHT*1.25),
+        VGroup(Tex("3"),Tex("="),Tex("0011")).arrange(RIGHT*1.25),
+        VGroup(Tex("4"),Tex("="),Tex("0100")).arrange(RIGHT*1.25),
+        VGroup(Tex("5"),Tex("="),Tex("0101")).arrange(RIGHT*1.25),
+        VGroup(Tex("6"),Tex("="),Tex("0110")).arrange(RIGHT*1.25),
+        VGroup(Tex("7"),Tex("="),Tex("0111")).arrange(RIGHT*1.25),
+        VGroup(Tex("8"),Tex("="),Tex("1000")).arrange(RIGHT*1.25),
+        VGroup(Tex("9"),Tex("="),Tex("1001")).arrange(RIGHT*1.25),
+        VGroup(Tex("A"),Tex("="),Tex("1010")).arrange(RIGHT*1.25),
+        VGroup(Tex("B"),Tex("="),Tex("1011")).arrange(RIGHT*1.25),
+        VGroup(Tex("C"),Tex("="),Tex("1100")).arrange(RIGHT*1.25),
+        VGroup(Tex("D"),Tex("="),Tex("1101")).arrange(RIGHT*1.25),
+        VGroup(Tex("E"),Tex("="),Tex("1110")).arrange(RIGHT*1.25),
+        VGroup(Tex("F"),Tex("="),Tex("1111")).arrange(RIGHT*1.25),
+    ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
+        box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
+
+        base=16
+        number="F4A5"
+        animate=False
+        show_table=True
+
+        num_str=str(number)
+        n=len(num_str)
+
+        if base not in [2,4,8,16]:
+            raise ValueError("Base must be one of 2,4,8,16")
+        
+        group_size={2:1,4:2,8:3,16:4}[base]
+
+        if animate or show_table:
+            self.add(table,box)
+        
+        number_tex=VGroup(*[Tex(c) for c in num_str]).arrange(RIGHT,buff=.1).to_edge(UP).shift(DOWN+LEFT*(animate or show_table))
+        
+        bf=.7 if base == 8 else .9 if base == 16 else .3
+        buffed_num=VGroup(*[Tex(c) for c in num_str]).arrange(RIGHT,buff=bf).next_to(number_tex,DOWN*2)
+        bin_num=VGroup(*[Tex(binaryrep(get_char_value(num_str[i]),base)).next_to(buffed_num[i],DOWN) for i in range(n)])
+        result=VGroup(
+                    VGroup(Tex("("),Tex(num_str),Tex(f")_{{{base}}}")).arrange(RIGHT,buff=.1),
+                    Tex("="),
+                    VGroup(Tex("("),VGroup(*[c.copy() for c in bin_num]).arrange(RIGHT,buff=.15),Tex(")_{2}")).arrange(RIGHT,buff=.1)
+                    ).arrange(RIGHT).next_to(bin_num,DOWN*2)
+
+        if animate:
+            self.play(Write(number_tex))
+            self.play(TransformMatchingParts(number_tex,buffed_num))
+            for i in range(n):
+                val=get_char_value(num_str[i])
+                self.play(FadeIn(bin_num[i]),Indicate(buffed_num[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
+            self.play(TransformMatchingParts(bin_num.copy(),result[2][2]),FadeIn(VGroup(result[:2],result[2][0],result[2][-1])))
+            
+            if not show_table:
+                self.play(FadeOut(VGroup(table,box)))
+                self.play(FadeOut(VGroup(buffed_num,bin_num)),result.animate.move_to(ORIGIN))
+            else:
+                self.play(FadeOut(VGroup(buffed_num,bin_num)))
+
+        else:
+            self.add(number_tex,buffed_num,bin_num,result)
+            self.wait()
 
 
