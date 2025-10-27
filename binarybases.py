@@ -1,5 +1,6 @@
 from manimlib import *
 from matplotlib.table import table
+
 def get_label_string(bin):
     n=len(bin)
     s=0
