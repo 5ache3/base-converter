@@ -101,7 +101,6 @@ class AND(Scene):
 
         super().__init__(
                    file_writer_config={"write_to_movie":animate,"file_name":f"AND-{number1}-{number2}-B{base}"},
-                   camera_config={"background_color":BLACK},
                    )
     def construct(self):
         base=self.base
@@ -196,7 +195,6 @@ class OR(Scene):
         
         super().__init__(
                    file_writer_config={"write_to_movie":animate,"file_name":f"OR_{number1}_{number2}_B{base}"},
-                   camera_config={"background_color":BLACK},
                    )
     def construct(self):
         base=self.base
@@ -354,7 +352,6 @@ class XOR(Scene):
         self.show_table=show_table
         super().__init__(
                    file_writer_config={"write_to_movie":animate,"file_name":f"XOR_{number1}_{number2}_B{base}"},
-                   camera_config={"background_color":BLACK},
                    )
     def construct(self):
         base=self.base
@@ -437,8 +434,8 @@ class XOR(Scene):
             self.wait()
 
 
-def and_logic(num1,num2,base,animation=True,show_table=True,bg=None):
-    scene = AND(num1,num2,base,animate=animation)
+def and_logic(num1,num2,base,animation=True,):
+    scene = AND(num1,num2,base,animate=animation,)
     scene.run()
     if not animation:
         import os
@@ -447,8 +444,8 @@ def and_logic(num1,num2,base,animation=True,show_table=True,bg=None):
         scene.get_image().save(f"images/AND{num1}-{num2}-B{base}.png")
 
 
-def or_logic(num1,num2,base,animation=True,show_table=True,bg=None):
-    scene = OR(num1,num2,base,animate=animation)
+def or_logic(num1,num2,base,animation=True,):
+    scene = OR(num1,num2,base,animate=animation,)
     scene.run()
     if not animation:
         import os
@@ -457,7 +454,7 @@ def or_logic(num1,num2,base,animation=True,show_table=True,bg=None):
         scene.get_image().save(f"images/OR{num1}-{num2}-B{base}.png")
 
 
-def xor_logic(num1,num2,base,animation=True,show_table=True,bg=None):
+def xor_logic(num1,num2,base,animation=True,show_table=True):
     scene = XOR(num1,num2,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:

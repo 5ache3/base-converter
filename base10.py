@@ -45,13 +45,12 @@ def c_2_n(c):
 
 
 class TentoN(Scene):
-    def __init__(self,number,base,animate=True,bg=None,**kwargs):
+    def __init__(self,number,base,animate=True,**kwargs):
         self.number=number
         self.base=base
         self.animate=animate
         super().__init__(
-                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B10_to_B{base}"},
-                   camera_config={"background_color":bg if bg else BLACK},
+                   file_writer_config={"write_to_movie":animate,"file_name":f"{number}-B10_to_B{base}"},
                    **kwargs)
         
     def construct(self):
@@ -142,13 +141,12 @@ class TentoN(Scene):
         # self.embed()
         
 class NtoTen(Scene):
-    def __init__(self,number,base,animate=True,bg=None,**kwargs):
+    def __init__(self,number,base,animate=True,**kwargs):
         self.number=number
         self.base=base
         self.animate=animate
         super().__init__(
-                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B10_to_B{base}"},
-                   camera_config={"background_color":bg if bg else BLACK},
+                   file_writer_config={"write_to_movie":animate,"file_name":f"{number}-B10_to_B{base}"},
                    **kwargs)
         
     def construct(self):
@@ -230,8 +228,8 @@ class NtoTen(Scene):
             self.wait(2)
 
 
-def convert_base10_to_n(num,base,animation=True,bg=None):
-    scene = TentoN(num,base,animate=animation,bg=bg)
+def convert_base10_to_n(num,base,animation=True):
+    scene = TentoN(num,base,animate=animation)
     scene.run()
     if not animation:
         import os
@@ -239,8 +237,8 @@ def convert_base10_to_n(num,base,animation=True,bg=None):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B10_to_B{base}.png")
     
-def convert_n_to_base10(num,base,animation=True,bg=None):
-    scene = NtoTen(num,base,animate=animation,bg=bg)
+def convert_n_to_base10(num,base,animation=True):
+    scene = NtoTen(num,base,animate=animation)
     scene.run()
     if not animation:
         import os

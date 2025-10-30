@@ -22,14 +22,13 @@ def binaryrep(num,base):
         b='0'+b
     return b
 class Frombase2(Scene):
-    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
+    def __init__(self,number,base,animate=True,show_table=True,**kwargs):
         self.number=number
         self.base=base
         self.animate=animate
         self.show_table=show_table
         super().__init__(
                    file_writer_config={"write_to_movie":True,"file_name":f"{number}-B2_to_B{base}"},
-                   camera_config={"background_color":bg if bg else BLACK},
                    **kwargs)
 
 
@@ -146,14 +145,13 @@ def get_table_and_box():
     return table,box
 class Tobase2(Scene):
     
-    def __init__(self,number,base,animate=True,show_table=True,bg=None,**kwargs):
+    def __init__(self,number,base,animate=True,show_table=True,**kwargs):
         self.number=number
         self.base=base
         self.animate=animate
         self.show_table=show_table
         super().__init__(
                    file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{base}_to_B2"},
-                   camera_config={"background_color":bg if bg else BLACK},
                    **kwargs)
         
     def construct(self):
@@ -276,8 +274,8 @@ class InterBase2(Scene):
 
 
 
-def convert_base2_to_n(num,base,animation=True,show_table=True,bg=None):
-    scene = Frombase2(num,base,animate=animation,show_table=show_table,bg=bg)
+def convert_base2_to_n(num,base,animation=True,show_table=True):
+    scene = Frombase2(num,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
         import os
@@ -286,8 +284,8 @@ def convert_base2_to_n(num,base,animation=True,show_table=True,bg=None):
         scene.get_image().save(f"images/{num}-B2_to_B{base}.png")
 
     
-def convert_base_n_to_2(num,base,animation=True,show_table=True,bg=None):
-    scene = Tobase2(num,base,animate=animation,show_table=show_table,bg=bg)
+def convert_base_n_to_2(num,base,animation=True,show_table=True):
+    scene = Tobase2(num,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
         import os
@@ -297,6 +295,5 @@ def convert_base_n_to_2(num,base,animation=True,show_table=True,bg=None):
 
 
 if __name__=="__main__":
-
     convert_base2_to_n(100001101,8,animation=True,show_table=False)
     convert_base_n_to_2("F501",16,show_table=False)
