@@ -1,5 +1,6 @@
 camera:
-  resolution: (3840, 2160)
+  # resolution: (3840, 2160) # 4k
+  resolution: (1920, 1080)
   background_color: "#000000"
   fps: 30
   background_opacity: 1

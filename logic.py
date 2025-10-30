@@ -279,7 +279,7 @@ def xor(b1,b2):
     b2=int(b2)
     return str(int((b1 and not b2) or (not b1 and b2)))
 
-from manimlib import *
+
 
 def create_truth_table(headers, rows, title_text=None, position=ORIGIN):
     """

@@ -21,6 +21,8 @@ def binaryrep(num,base):
     while len(b)<l:
         b='0'+b
     return b
+
+
 class Frombase2(Scene):
     def __init__(self,number,base,animate=True,show_table=True,**kwargs):
         self.number=number
@@ -143,6 +145,7 @@ def get_table_and_box():
     box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
 
     return table,box
+
 class Tobase2(Scene):
     
     def __init__(self,number,base,animate=True,show_table=True,**kwargs):
@@ -205,27 +208,28 @@ class Tobase2(Scene):
 
 class InterBase2(Scene):
 
-    # def __init__(self,number,str_base,end_base,animate=True,show_table=True,bg=None,**kwargs):
-    #     self.number=number
-    #     self.str_base=str_base
-    #     self.end_base=end_base
-    #     self.animate=animate
-    #     self.show_table=show_table
-    #     super().__init__(
-    #                 file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{str_base}_to_B{end_base}"},
-    #                 camera_config={"background_color":bg if bg else BLACK},
-    #                 **kwargs)
+    def __init__(self,number,str_base,end_base,animate=True,show_table=True,bg=None,**kwargs):
+        self.number=number
+        self.str_base=str_base
+        self.end_base=end_base
+        self.animate=animate
+        self.show_table=show_table
+        super().__init__(
+                    file_writer_config={"write_to_movie":animate,"file_name":f"{number}-B{str_base}_to_B{end_base}"},
+                    **kwargs)
    
     def construct(self):
-        number='62F21'
-        str_base=16
-        end_base=8
-        animate=False
-        show_table=False
+        number=str(self.number)
+        str_base=self.str_base
+        end_base=self.end_base
+        animate=self.animate
+        show_table=self.show_table
+
         bf1=.7 if str_base == 8 else .9 if str_base == 16 else .3
         bf2=.7 if end_base == 8 else .9 if end_base == 16 else .3
         group_size1={2:1,4:2,8:3,16:4}[str_base]
         group_size2={2:1,4:2,8:3,16:4}[end_base]
+
         if str_base not in [2,4,8,16] or end_base not in [2,4,8,16]:
             raise ValueError("starting and ending bases must be powers of 2 (2,4,8,16)")
         
@@ -233,14 +237,43 @@ class InterBase2(Scene):
         n=len(str_num)
         num_tex=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=.1).to_edge(UP).shift(DOWN+LEFT*(animate or show_table))
         num_tex_sep=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=bf1).next_to(num_tex,DOWN*2)
-        bits=VGroup(*[Tex(binaryrep(get_char_value(str_num[i]),str_base)).next_to(num_tex_sep[i],DOWN) for i in range(n)])
-        bits2=VGroup(*[Tex(c) for c in ''.join([bit.get_string() for bit in bits])]).arrange(RIGHT,buff=.1).next_to(bits,DOWN*2)
+
+        bits=VGroup(*[
+            Tex(binaryrep(get_char_value(str_num[i]),str_base))
+                .next_to(num_tex_sep[i],DOWN)
+                for i in range(n)
+                ])
+
+        bits2=VGroup(*[
+                Tex(c) 
+                for c in ''.join([
+                    bit.get_string() 
+                    for bit in bits
+                    ])
+                ]).arrange(RIGHT,buff=.1).next_to(bits,DOWN*2)
         
-        bits2_sep=VGroup(*[Tex(''.join([bit.get_string() for bit in bits2[::-1][i:i+group_size2]])[::-1]) for i in range(0,len(bits2),group_size2)])[::-1].arrange(RIGHT).move_to(bits2.get_center())
+        bits2_sep=VGroup(*[
+            Tex(''.join([
+                bit.get_string() 
+                for bit in bits2[::-1][i:i+group_size2]
+                ])[::-1])
+            for i in range(0,len(bits2),group_size2)
+            ])[::-1].arrange(RIGHT).move_to(bits2.get_center())
         
         target_group=VGroup(*[Tex(get_label_string(bits2_sep[i].get_string())).next_to(bits2_sep[i],DOWN) for i in range(len(bits2_sep))])
-        
         target=Tex(''.join([c.get_string() for c in target_group]))
+        
+        bits_2 = VGroup(
+            *[
+                VGroup(*[Tex(c) for c in item.get_string()])
+                .arrange(RIGHT, buff=.05)
+                .next_to(num_tex_sep[i],DOWN)
+                for i, item in enumerate(bits)
+            ]
+        )
+
+        bits2_2=VGroup(*[ VGroup(*[Tex(c) for c in item.get_string()]).arrange(RIGHT,buff=.05) for item in bits2_sep]).arrange(RIGHT).move_to(bits2_sep.get_center())
+
         result=VGroup(
             VGroup(Tex('('),num_tex.copy(),Tex(f")_{{{str_base}}}")).arrange(RIGHT,buff=.1),
             Tex("="),
@@ -258,17 +291,22 @@ class InterBase2(Scene):
             
             for i in range(len(num_tex_sep)):
                 val=get_char_value(num_tex_sep[i].get_string())
-                self.play(FadeIn(bits[i]),Indicate(num_tex_sep[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
-            self.play(FadeTransform(bits.copy(),bits2_sep))
-            for i in range(len(bits2_sep)):
+                self.play(FadeIn(bits_2[i]),Indicate(num_tex_sep[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
+            
+            self.play(TransformMatchingParts(VGroup(*[c for c in bits_2]).copy(),VGroup(*[c for c in bits2_2])))
+            
+            # self.play(TransformMatchingParts(bits2_2,bits2_sep))
+
+            for i in range(len(bits2_2)):
                 val=get_char_value(target_group[i].get_string())
-                self.play(FadeIn(target_group[i]),Indicate(bits2_sep[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
+                self.play(FadeIn(target_group[i]),Indicate(bits2_2[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
             
             self.play(TransformMatchingShapes(target_group.copy(),result[2][1]),FadeIn(VGroup(result[:2],result[2][0],result[2][2])))
             if not show_table:
                 self.play(FadeOut(VGroup(box,table)))
         else:
             self.add(num_tex,num_tex_sep,bits,bits2_sep,target_group,result)
+            self.wait()
 
 
 
@@ -293,7 +331,17 @@ def convert_base_n_to_2(num,base,animation=True,show_table=True):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B{base}_to_B2.png")
 
+def convert_base_n_to_n(num,base1,base2,animation=True,show_table=True):
+    scene = InterBase2(num,base1,base2,animate=animation,show_table=show_table)
+    scene.run()
+    if not animation:
+        import os
+        if not os.path.exists("images"):
+            os.makedirs("images")
+        scene.get_image().save(f"images/{num}-B{base1}_to_B{base2}.png")
+
 
 if __name__=="__main__":
-    convert_base2_to_n(100001101,8,animation=True,show_table=False)
-    convert_base_n_to_2("F501",16,show_table=False)
+    # convert_base2_to_n(100001101,8,animation=True,show_table=False)
+    # convert_base_n_to_2("F501",16,show_table=False)
+    convert_base_n_to_n("765434",8,16,animation=True,show_table=False)
