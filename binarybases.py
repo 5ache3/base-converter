@@ -21,20 +21,48 @@ def binaryrep(num,base):
         b='0'+b
     return b
 
+def check_base(number,base):
+    if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+    if base <2 or base > 16:
+        raise ValueError("base mut be between 2 and 16")
+    
+    num=str(number).upper()
+    chars=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
-class Frombase2(Scene):
-    def __init__(self,number,base,animate=True,show_table=True,**kwargs):
-        self.number=number
-        self.base=base
-        self.animate=animate
-        self.show_table=show_table
-        super().__init__(
-                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B2_to_B{base}"},
-                   **kwargs)
+    if base == 2:
+        if '0B' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 8:
+        if '0O' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 16:
+        if '0X' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    for c in num:
+        if c not in chars[:base]:
+            raise ValueError(f"{number} is not a valid base {base} number")
+    return num
+ 
 
-
-    def construct(self):
-        table=VGroup(
+def get_table_and_box():
+    table=VGroup(
         Text("nombres en binaire :"),
         VGroup(Tex("0"),Tex("="),Tex("0000")).arrange(RIGHT*1.25),
         VGroup(Tex("1"),Tex("="),Tex("0001")).arrange(RIGHT*1.25),
@@ -53,27 +81,43 @@ class Frombase2(Scene):
         VGroup(Tex("E"),Tex("="),Tex("1110")).arrange(RIGHT*1.25),
         VGroup(Tex("F"),Tex("="),Tex("1111")).arrange(RIGHT*1.25),
     ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
-        box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
+    box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
 
+    return table,box
+
+
+class Frombase2(Scene):
+    def __init__(self,number,base,animate=True,show_table=True,**kwargs):
+        self.number=number
+        self.base=base
+        self.animate=animate
+        self.show_table=show_table
+        super().__init__(
+                   file_writer_config={"write_to_movie":animate,"file_name":f"{number}-B2_to_B{base}"},
+                   **kwargs)
+
+
+    def construct(self):
         base=self.base
         number=self.number
         animate=self.animate
         show_table=self.show_table
 
             
-        num_str=str(number)
-        n=len(num_str)
-
         if type(base)!=int:
             raise ValueError("base must be an integer")
         
         if base not in [2,4,8,16]:
             raise ValueError("Base must be one of 2,4,8,16")
         
+        num_str=check_base(number,2)
+        n=len(num_str)
+
         
+        table,box=get_table_and_box()
         if animate or show_table:
             self.add(table,box)
-            
+
         group_size={2:1,4:2,8:3,16:4}[base]
 
         bits=VGroup(*[Tex(num_str[i]) for i in range(n)]).arrange(RIGHT,buff=0.1).to_edge(UP).shift(LEFT+DOWN)
@@ -128,30 +172,6 @@ class Frombase2(Scene):
             self.add(main_result)
             self.wait()
 
-def get_table_and_box():
-    table=VGroup(
-        Text("nombres en binaire :"),
-        VGroup(Tex("0"),Tex("="),Tex("0000")).arrange(RIGHT*1.25),
-        VGroup(Tex("1"),Tex("="),Tex("0001")).arrange(RIGHT*1.25),
-        VGroup(Tex("2"),Tex("="),Tex("0010")).arrange(RIGHT*1.25),
-        VGroup(Tex("3"),Tex("="),Tex("0011")).arrange(RIGHT*1.25),
-        VGroup(Tex("4"),Tex("="),Tex("0100")).arrange(RIGHT*1.25),
-        VGroup(Tex("5"),Tex("="),Tex("0101")).arrange(RIGHT*1.25),
-        VGroup(Tex("6"),Tex("="),Tex("0110")).arrange(RIGHT*1.25),
-        VGroup(Tex("7"),Tex("="),Tex("0111")).arrange(RIGHT*1.25),
-        VGroup(Tex("8"),Tex("="),Tex("1000")).arrange(RIGHT*1.25),
-        VGroup(Tex("9"),Tex("="),Tex("1001")).arrange(RIGHT*1.25),
-        VGroup(Tex("A"),Tex("="),Tex("1010")).arrange(RIGHT*1.25),
-        VGroup(Tex("B"),Tex("="),Tex("1011")).arrange(RIGHT*1.25),
-        VGroup(Tex("C"),Tex("="),Tex("1100")).arrange(RIGHT*1.25),
-        VGroup(Tex("D"),Tex("="),Tex("1101")).arrange(RIGHT*1.25),
-        VGroup(Tex("E"),Tex("="),Tex("1110")).arrange(RIGHT*1.25),
-        VGroup(Tex("F"),Tex("="),Tex("1111")).arrange(RIGHT*1.25),
-    ).arrange(DOWN).to_corner(RIGHT).scale(.65).shift(RIGHT).set_opacity(.7)
-    box=SurroundingRectangle(table,color=WHITE,stroke_opacity=.7)
-
-    return table,box
-
 class Tobase2(Scene):
     
     def __init__(self,number,base,animate=True,show_table=True,**kwargs):
@@ -160,7 +180,7 @@ class Tobase2(Scene):
         self.animate=animate
         self.show_table=show_table
         super().__init__(
-                   file_writer_config={"write_to_movie":True,"file_name":f"{number}-B{base}_to_B2"},
+                   file_writer_config={"write_to_movie":animate,"file_name":f"{number}-B{base}_to_B2"},
                    **kwargs)
         
     def construct(self):
@@ -177,7 +197,7 @@ class Tobase2(Scene):
         if base not in [2,4,8,16]:
             raise ValueError("Base must be one of 2,4,8,16")
         
-        num_str=str(number)
+        num_str=check_base(number,base)
         n=len(num_str)
         table,box=get_table_and_box()
         
@@ -247,7 +267,7 @@ class InterBase2(Scene):
         group_size2={2:1,4:2,8:3,16:4}[end_base]
 
         
-        str_num=str(number)
+        str_num=check_base(number,str_base)
         n=len(str_num)
         num_tex=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=.1).to_edge(UP).shift(DOWN+LEFT*(animate or show_table))
         num_tex_sep=VGroup(*[Tex(c) for c in str_num]).arrange(RIGHT,buff=bf1).next_to(num_tex,DOWN*2)
@@ -356,6 +376,6 @@ def convert_base_n_to_n(num,base1,base2,animation=True,show_table=True):
 
 
 if __name__=="__main__":
-    # convert_base2_to_n(100001101,8,animation=True,show_table=False)
-    # convert_base_n_to_2("F501",16,show_table=False)
+    convert_base2_to_n(100001101,8,animation=True,show_table=False)
+    convert_base_n_to_2("F501",16,animation=True,show_table=False)
     convert_base_n_to_n("765434",8,16,animation=True,show_table=False)

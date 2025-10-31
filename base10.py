@@ -43,7 +43,45 @@ def c_2_n(c):
     d2={b:a for a,b in d.items()}
     return d2[c]
 
+def check_base(number,base):
+    if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+    if base <2 or base > 16:
+        raise ValueError("base mut be between 2 and 16")
+    
+    num=str(number).upper()
+    chars=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
 
+    if base == 2:
+        if '0B' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 8:
+        if '0O' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 16:
+        if '0X' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    for c in num:
+        if c not in chars[:base]:
+            raise ValueError(f"{number} is not a valid base {base} number")
+    return num
+   
 class TentoN(Scene):
     def __init__(self,number,base,animate=True,**kwargs):
         self.number=number
@@ -65,7 +103,8 @@ class TentoN(Scene):
         if base <2 or base > 16:
             raise ValueError("base mut be between 2 and 16")
         
-
+        number=check_base(number,10)
+        number=int(number)
 
         main_group=VGroup()
         i=0
@@ -162,7 +201,6 @@ class NtoTen(Scene):
         num=str(self.number)
         base=self.base
         animate=self.animate
-        n=len(num)
         
         if type(base)!=int:
             raise ValueError("base must be an integer")
@@ -170,6 +208,8 @@ class NtoTen(Scene):
         if base <2 or base > 16:
             raise ValueError("base mut be between 2 and 16")
 
+        num=check_base(self.number,base)
+        n=len(num)
 
         num_group=VGroup(*[Tex(c) for c in num]).arrange(RIGHT).shift(UP*2)
         indecies=VGroup(*[Tex(f'{i}',fill_color=BLUE,fill_opacity=.5).move_to(num_group[n-i-1].get_top()+UP*.4).scale(.8) for i in range(n)])
@@ -265,4 +305,5 @@ def convert_n_to_base10(num,base,animation=True):
 
 
 if __name__ == "__main__":
-    convert_base10_to_n(255091,'7',animation=False)
+    # convert_base10_to_n(989,2,animation=False)
+    convert_n_to_base10(oct(7121),8,animation=False)

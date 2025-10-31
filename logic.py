@@ -90,6 +90,45 @@ def get_binary(num,base=10):
 
     return str(bin(s))[2:]
     
+def check_base(number,base):
+    if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+    if base <2 or base > 16:
+        raise ValueError("base mut be between 2 and 16")
+    
+    num=str(number).upper()
+    chars=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']
+
+    if base == 2:
+        if '0B' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 8:
+        if '0O' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    if base == 16:
+        if '0X' in num:
+            num=num[2:]
+        for c in num:
+            if c not in chars[:base]:
+                raise ValueError(f"{number} is not a valid base {base} number")
+        return num
+    
+    for c in num:
+        if c not in chars[:base]:
+            raise ValueError(f"{number} is not a valid base {base} number")
+    return num
+   
 
 class AND(Scene):
     def __init__(self, number1, number2, base=10, animate=False,show_table=True):
@@ -115,6 +154,9 @@ class AND(Scene):
         if base <2 or base > 16:
             raise ValueError("base mut be between 2 and 16")
 
+        num1=check_base(num1,base)
+        num2=check_base(num2,base)
+
         table=create_truth_table(headers=['A','B','A \land B'],rows=[['0','0','0'],['0','1','0'],['1','0','0'],['1','1','1']]).to_edge(DR+UP*1)
         indecies={'00':1,'01':2,'10':3,'11':4}
         if animate or show_table:
@@ -129,7 +171,7 @@ class AND(Scene):
             bin2='0'+bin2
 
         if base !=2:
-            main_tex=Tex(f'({num1})_{{{base}}} \oplus ({num2})_{{{base}}}').to_edge(UP)
+            main_tex=Tex(f'({num1})_{{{base}}} \land ({num2})_{{{base}}}').to_edge(UP)
             self.add(main_tex)
         len_1 = len(str(num1)+str(base))+2
         len_2 = len(str(num2)+str(base))+2
@@ -207,8 +249,7 @@ class OR(Scene):
         animate=self.animate
         num1=self.number1
         num2=self.number2
-        bin1=get_binary(num1,base)
-        bin2=get_binary(num2,base)
+
         show_table=self.show_table
 
         if type(base)!=int:
@@ -216,6 +257,12 @@ class OR(Scene):
         
         if base <2 or base > 16:
             raise ValueError("base mut be between 2 and 16")
+
+        num1=check_base(num1,base)
+        num2=check_base(num2,base)
+
+        bin1=get_binary(num1,base)
+        bin2=get_binary(num2,base)
 
         table=create_truth_table(headers=['A','B','A \lor B'],rows=[['0','0','0'],['0','1','1'],['1','0','1'],['1','1','1']]).to_edge(DR+UP*1)
         indecies={'00':1,'01':2,'10':3,'11':4}
@@ -227,7 +274,7 @@ class OR(Scene):
             bin2='0'+bin2
 
         if base !=2:
-            main_tex=Tex(f'({num1})_{{{base}}} \oplus ({num2})_{{{base}}}').to_edge(UP)
+            main_tex=Tex(f'({num1})_{{{base}}} \lor ({num2})_{{{base}}}').to_edge(UP)
             self.add(main_tex)
         len_1 = len(str(num1)+str(base))+2
         len_2 = len(str(num2)+str(base))+2
@@ -311,8 +358,6 @@ class XOR(Scene):
         num1=self.number1
         num2=self.number2
         show_table=self.show_table
-        bin1=get_binary(str(num1),base)
-        bin2=get_binary(str(num2),base)
 
         if type(base)!=int:
             raise ValueError("base must be an integer")
@@ -320,6 +365,12 @@ class XOR(Scene):
         if base <2 or base > 16:
             raise ValueError("base mut be between 2 and 16")
         
+        num1=check_base(num1,base)
+        num2=check_base(num2,base)
+
+        bin1=get_binary(str(num1),base)
+        bin2=get_binary(str(num2),base)
+
         table=create_truth_table(headers=['A','B','A \oplus B'],rows=[['0','0','0'],['0','1','1'],['1','0','1'],['1','1','0']]).to_edge(DR+UP*1)
         if animate or show_table:
             self.add(table)
@@ -425,6 +476,6 @@ def xor_logic(num1,num2,base,animation=True,show_table=True):
 
 if __name__=='__main__':
     
-    xor_logic(101101,110011,2,animation=False)
-    or_logic(154,118,10,animation=True)
-    and_logic(154,118,10,animation=True)
+    # xor_logic(101101,110011,2,animation=True)
+    or_logic(hex(1540),"1189F",16,animation=True)
+    # and_logic(154,118,10,animation=True)
