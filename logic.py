@@ -109,6 +109,12 @@ class AND(Scene):
         num2=self.number2
         show_table=self.show_table
 
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base <2 or base > 16:
+            raise ValueError("base mut be between 2 and 16")
+
         table=create_truth_table(headers=['A','B','A \land B'],rows=[['0','0','0'],['0','1','0'],['1','0','0'],['1','1','1']]).to_edge(DR+UP*1)
         indecies={'00':1,'01':2,'10':3,'11':4}
         if animate or show_table:
@@ -204,6 +210,13 @@ class OR(Scene):
         bin1=get_binary(num1,base)
         bin2=get_binary(num2,base)
         show_table=self.show_table
+
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base <2 or base > 16:
+            raise ValueError("base mut be between 2 and 16")
+
         table=create_truth_table(headers=['A','B','A \lor B'],rows=[['0','0','0'],['0','1','1'],['1','0','1'],['1','1','1']]).to_edge(DR+UP*1)
         indecies={'00':1,'01':2,'10':3,'11':4}
         if show_table or animate:
@@ -281,67 +294,6 @@ def xor(b1,b2):
 
 
 
-def create_truth_table(headers, rows, title_text=None, position=ORIGIN):
-    """
-    Creates a stylized truth table as a VGroup for ManimGL scenes.
-
-    Args:
-        headers (list[str]): Column headers.
-        rows (list[list[str]]): Each sublist is a row of strings.
-        title_text (str): Optional title above the table.
-        position (np.array): Position to move the table to.
-
-    Returns:
-        VGroup: (title, table)
-    """
-
-    # === CONFIG ===
-    cell_w, cell_h = 1.2, 0.6
-    font_size = 32
-    header_color = BLACK
-    row_fill_1 = BLACK
-    row_fill_2 = BLACK
-
-    border_color = GREY
-
-    table = VGroup()
-
-    # === HEADER ===
-    header_group = VGroup()
-    for j, h in enumerate(headers):
-        rect = Rectangle(width=cell_w, height=cell_h,
-                         color=border_color, fill_opacity=1, fill_color=header_color)
-        text = Tex(h, color=WHITE, font_size=font_size)
-        text.move_to(rect.get_center())
-        cell = VGroup(rect, text).move_to(j * cell_w * RIGHT)
-        header_group.add(cell)
-    header_group.arrange(RIGHT, buff=0)
-    table.add(header_group)
-
-    # === ROWS ===
-    for i, row in enumerate(rows):
-        row_group = VGroup()
-        for j, val in enumerate(row):
-            rect = Rectangle(width=cell_w, height=cell_h, color=border_color,
-                             fill_opacity=1, fill_color=row_fill_1 if i % 2 == 0 else row_fill_2)
-            text = Tex(val, color=WHITE, font_size=font_size)
-            text.move_to(rect.get_center())
-            cell = VGroup(rect, text).move_to(j * cell_w * RIGHT)
-            row_group.add(cell)
-        row_group.arrange(RIGHT, buff=0)
-        table.add(row_group)
-
-    # === LAYOUT ===
-    table.arrange(DOWN, buff=0)
-    table.move_to(position)
-
-    # === OPTIONAL TITLE ===
-    title = None
-    if title_text:
-        title = Tex(title_text, color=YELLOW).scale(1)
-        title.next_to(table, UP, buff=0.5)
-
-    return VGroup(title, table) if title else table
 
 class XOR(Scene):
     def __init__(self, number1, number2, base=10, animate=False,show_table=True):
@@ -362,6 +314,12 @@ class XOR(Scene):
         bin1=get_binary(str(num1),base)
         bin2=get_binary(str(num2),base)
 
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base <2 or base > 16:
+            raise ValueError("base mut be between 2 and 16")
+        
         table=create_truth_table(headers=['A','B','A \oplus B'],rows=[['0','0','0'],['0','1','1'],['1','0','1'],['1','1','0']]).to_edge(DR+UP*1)
         if animate or show_table:
             self.add(table)

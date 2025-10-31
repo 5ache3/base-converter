@@ -1,5 +1,4 @@
 from manimlib import *
-from matplotlib.table import table
 
 def get_label_string(bin):
     n=len(bin)
@@ -61,13 +60,20 @@ class Frombase2(Scene):
         animate=self.animate
         show_table=self.show_table
 
-        if animate or show_table:
-            self.add(table,box)
-
+            
         num_str=str(number)
         n=len(num_str)
+
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
         if base not in [2,4,8,16]:
             raise ValueError("Base must be one of 2,4,8,16")
+        
+        
+        if animate or show_table:
+            self.add(table,box)
+            
         group_size={2:1,4:2,8:3,16:4}[base]
 
         bits=VGroup(*[Tex(num_str[i]) for i in range(n)]).arrange(RIGHT,buff=0.1).to_edge(UP).shift(LEFT+DOWN)
@@ -165,11 +171,15 @@ class Tobase2(Scene):
         animate=self.animate
         show_table=self.show_table
 
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base not in [2,4,8,16]:
+            raise ValueError("Base must be one of 2,4,8,16")
+        
         num_str=str(number)
         n=len(num_str)
         table,box=get_table_and_box()
-        if base not in [2,4,8,16]:
-            raise ValueError("Base must be one of 2,4,8,16")
         
         group_size={2:1,4:2,8:3,16:4}[base]
 
@@ -224,14 +234,18 @@ class InterBase2(Scene):
         end_base=self.end_base
         animate=self.animate
         show_table=self.show_table
-
+        
+        if type(str_base)!=int or type(end_base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if str_base not in [2,4,8,16] or end_base not in [2,4,8,16]:
+            raise ValueError("starting and ending bases must be powers of 2 (2,4,8,16)")
+        
         bf1=.7 if str_base == 8 else .9 if str_base == 16 else .3
         bf2=.7 if end_base == 8 else .9 if end_base == 16 else .3
         group_size1={2:1,4:2,8:3,16:4}[str_base]
         group_size2={2:1,4:2,8:3,16:4}[end_base]
 
-        if str_base not in [2,4,8,16] or end_base not in [2,4,8,16]:
-            raise ValueError("starting and ending bases must be powers of 2 (2,4,8,16)")
         
         str_num=str(number)
         n=len(str_num)

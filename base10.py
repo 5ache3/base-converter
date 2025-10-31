@@ -58,8 +58,17 @@ class TentoN(Scene):
         base=self.base
         number=self.number
         animate=self.animate
-        i=0
+        
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base <2 or base > 16:
+            raise ValueError("base mut be between 2 and 16")
+        
+
+
         main_group=VGroup()
+        i=0
         while number > 0:
             if i ==0:
                 str_num=str(number)
@@ -154,6 +163,14 @@ class NtoTen(Scene):
         base=self.base
         animate=self.animate
         n=len(num)
+        
+        if type(base)!=int:
+            raise ValueError("base must be an integer")
+        
+        if base <2 or base > 16:
+            raise ValueError("base mut be between 2 and 16")
+
+
         num_group=VGroup(*[Tex(c) for c in num]).arrange(RIGHT).shift(UP*2)
         indecies=VGroup(*[Tex(f'{i}',fill_color=BLUE,fill_opacity=.5).move_to(num_group[n-i-1].get_top()+UP*.4).scale(.8) for i in range(n)])
         if animate:
@@ -248,5 +265,4 @@ def convert_n_to_base10(num,base,animation=True):
 
 
 if __name__ == "__main__":
-    convert_base10_to_n(25509,2,animation=False)
-    convert_n_to_base10('FF71',16,animation=False)
+    convert_base10_to_n(255091,'7',animation=False)
