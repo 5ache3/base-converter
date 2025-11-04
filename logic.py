@@ -443,8 +443,8 @@ class XOR(Scene):
             self.wait()
 
 
-def and_logic(num1,num2,base,animation=True,):
-    scene = AND(num1,num2,base,animate=animation,)
+def and_logic(num1,num2,base,animation=True,show_table=True):
+    scene = AND(num1,num2,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
         import os
@@ -453,8 +453,8 @@ def and_logic(num1,num2,base,animation=True,):
         scene.get_image().save(f"images/AND{num1}-{num2}-B{base}.png")
 
 
-def or_logic(num1,num2,base,animation=True,):
-    scene = OR(num1,num2,base,animate=animation,)
+def or_logic(num1,num2,base,animation=True,show_table=True):
+    scene = OR(num1,num2,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
         import os
