@@ -32,7 +32,7 @@ pip install manimgl
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/5ache3/base-convertor.git
+git clone https://github.com/5ache3/base-converter.git
 cd base-convertor
 ```
 
