@@ -50,7 +50,6 @@ convert(number, from_base, to_base, animate=True, **options)
 convert(1251, 10, 2, animate=True)
 ```
 ### Output (Example Animation)
-
 <video width="600" controls>
   <source src="assets/1251-B10_to_B2.mp4" type="video/mp4">
   Your browser does not support the video tag.

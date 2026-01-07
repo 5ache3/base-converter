@@ -3,15 +3,18 @@ from manimlib import *
 def get_label_string(bin):
     n=len(bin)
     s=0
+    if bin=='1010':
+        return 'A'
     for i in range(n):
         s+=int(bin[n-1-i])*(2**i)
     if s>10:
         return hex(s)[2:].upper()
+    
     return str(s)
 
 def get_char_value(c):
     d={'0':0,'1':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,
-       'A':10,'B':11,'C':12,'D':13,'E':14,'F':15}
+       'A':10,'B':11,'C':12,'D':13,'E':14,'F':15,'10':10}
     return d[c]
 
 def binaryrep(num,base):
@@ -137,7 +140,7 @@ class Frombase2(Scene):
                             ).move_to(grouped_bits[::-1][i].get_center()+DOWN*.75)
                             for i in range(len(grouped_bits))])
         labels_group=labels_group[::-1]
-
+        print(labels_group)
         result=VGroup(*[c.copy() for c in labels_group]).arrange(RIGHT).next_to(labels_group,DOWN*1.5)
 
         main_result=VGroup(
@@ -145,7 +148,7 @@ class Frombase2(Scene):
             ,Tex("="),
             VGroup(Tex("("),result.copy(),Tex(f")_{{{base}}}")).arrange(RIGHT,buff=.1)
             ).arrange(RIGHT).move_to(ORIGIN).shift(DOWN*2.5+LEFT)
-        
+        print(result)
         if animate:
             self.play(Write(bits))
             self.play(
@@ -154,7 +157,7 @@ class Frombase2(Scene):
         
             for i in range(len(grouped_bits)):
                 val=get_char_value(labels_group[i].get_string())
-                print(val)
+                print(labels_group[i].get_string())
                 self.play(FadeIn(labels_group[i]),Indicate(grouped_bits[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
             self.play(TransformMatchingParts(labels_group.copy(),result))
             self.play(TransformMatchingParts(result,main_result[2][1]),FadeIn(VGroup(main_result[:2],main_result[2][0],main_result[2][2])))
@@ -376,6 +379,4 @@ def convert_base_n_to_n(num,base1,base2,animation=True,show_table=True):
 
 
 if __name__=="__main__":
-    convert_base2_to_n(100001101,8,animation=True,show_table=False)
-    convert_base_n_to_2("F501",16,animation=True,show_table=False)
-    convert_base_n_to_n("765434",8,16,animation=True,show_table=False)
+    convert_base2_to_n(101011110011,16,animation=True,show_table=False)
