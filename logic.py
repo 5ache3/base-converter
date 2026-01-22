@@ -8,10 +8,10 @@ from manimlib.mobject.svg.text_mobject import Text
 from manimlib import Tex
 
 # --- Animations ---
-from manimlib.animation.creation import Write
-from manimlib.animation.fading import FadeIn, FadeOut
-from manimlib.animation.transform import TransformMatchingParts, TransformMatchingShapes
-from manimlib.animation.indication import Indicate
+from manimlib import Write
+from manimlib import FadeIn, FadeOut
+from manimlib import TransformMatchingParts, TransformMatchingShapes
+from manimlib import Indicate
 def get_char_value(c):
     d={'0':0,'1':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,
        'A':10,'B':11,'C':12,'D':13,'E':14,'F':15}

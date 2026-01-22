@@ -3,13 +3,13 @@ import os
 from manimlib.constants import *
 from manimlib.scene.scene import Scene
 from manimlib.mobject.types.vectorized_mobject import VGroup
-from manimlib.mobject.geometry import Line, Arrow, SurroundingRectangle
-from manimlib import Tex
+from manimlib.mobject.geometry import Line, Arrow
+from manimlib import Tex, SurroundingRectangle
 
 # --- Animations ---
-from manimlib.animation.creation import ShowCreation
-from manimlib.animation.fading import FadeIn, FadeOut
-from manimlib.animation.transform import TransformFromCopy, TransformMatchingStrings
+from manimlib import ShowCreation
+from manimlib import FadeIn, FadeOut
+from manimlib import TransformFromCopy, TransformMatchingStrings
 
 def n_2_c(num):
     d={

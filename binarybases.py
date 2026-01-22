@@ -3,15 +3,15 @@ import os
 from manimlib.constants import *
 from manimlib.scene.scene import Scene
 from manimlib.mobject.types.vectorized_mobject import VGroup
-from manimlib.mobject.geometry import SurroundingRectangle
+from manimlib import SurroundingRectangle
 from manimlib.mobject.svg.text_mobject import Text
 from manimlib import Tex
 
 # --- Animations ---
-from manimlib.animation.creation import Write
-from manimlib.animation.fading import FadeIn, FadeOut
-from manimlib.animation.transform import TransformMatchingParts, TransformMatchingShapes
-from manimlib.animation.indication import Indicate
+from manimlib import Write
+from manimlib import FadeIn, FadeOut
+from manimlib import TransformMatchingParts, TransformMatchingShapes
+from manimlib import Indicate
 
 def get_label_string(bin):
     n=len(bin)
@@ -153,7 +153,7 @@ class Frombase2(Scene):
                             ).move_to(grouped_bits[::-1][i].get_center()+DOWN*.75)
                             for i in range(len(grouped_bits))])
         labels_group=labels_group[::-1]
-        print(labels_group)
+
         result=VGroup(*[c.copy() for c in labels_group]).arrange(RIGHT).next_to(labels_group,DOWN*1.5)
 
         main_result=VGroup(
@@ -161,7 +161,7 @@ class Frombase2(Scene):
             ,Tex("="),
             VGroup(Tex("("),result.copy(),Tex(f")_{{{base}}}")).arrange(RIGHT,buff=.1)
             ).arrange(RIGHT).move_to(ORIGIN).shift(DOWN*2.5+LEFT)
-        print(result)
+        
         if animate:
             self.play(Write(bits))
             self.play(
@@ -170,7 +170,7 @@ class Frombase2(Scene):
         
             for i in range(len(grouped_bits)):
                 val=get_char_value(labels_group[i].get_string())
-                print(labels_group[i].get_string())
+                
                 self.play(FadeIn(labels_group[i]),Indicate(grouped_bits[i]),Indicate(table[val+1][0]),Indicate(table[val+1][2]))
             self.play(TransformMatchingParts(labels_group.copy(),result))
             self.play(TransformMatchingParts(result,main_result[2][1]),FadeIn(VGroup(main_result[:2],main_result[2][0],main_result[2][2])))
