@@ -1,8 +1,65 @@
 import sys
 import argparse
+import os
+import json
+
+CACHE_FILE = "scene_cache.json"
+
+def load_cache():
+    if os.path.exists(CACHE_FILE):
+        try:
+            with open(CACHE_FILE, "r") as f:
+                return json.load(f)
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+def save_cache(cache):
+    with open(CACHE_FILE, "w") as f:
+        json.dump(cache, f, indent=4)
+
+def get_cache_key(command, **params):
+    return f"{command}_{json.dumps(params, sort_keys=True)}"
+
+def get_predicted_path(command, **params):
+    """Predicts the output file path based on command parameters."""
+    animate = params.get("animate", True)
+    if command == "convert":
+        number = params.get("number")
+        base = params.get("base")
+        target_base = params.get("target_base")
+        if animate:
+            # ManimGL default output for video
+            return os.path.join("videos", "main", "1080p30", f"{number}-B{base}_to_B{target_base}.mp4")
+        else:
+            # Custom image output path in base10.py and binarybases.py
+            return os.path.join("images", f"{number}-B{base}_to_B{target_base}.png")
+    elif command == "logic":
+        a = params.get("a")
+        b = params.get("b")
+        base = params.get("base")
+        op = params.get("operation")
+        if animate:
+            # OR vs XOR vs AND in logic.py use different name formats
+            fname = f"{op}_{a}_{b}_B{base}" if op != "AND" else f"AND-{a}-{b}-B{base}"
+            return os.path.join("videos", "main", "1080p30", f"{fname}.mp4")
+        else:
+            fname = f"{op}{a}-{b}-B{base}"
+            return os.path.join("images", f"{fname}.png")
+    return None
 
 # We define the functions but delay imports to avoid CLI hijacking by ManimGL
 def convert(number, base, target_base, animate=True, show_table=True):
+    params = {"number": str(number), "base": base, "target_base": target_base, "animate": animate, "show_table": show_table}
+    cache = load_cache()
+    key = get_cache_key("convert", **params)
+    
+    if key in cache:
+        path = cache[key]
+        if os.path.exists(path):
+            print(f"Using cached result: {path}")
+            return path
+    
     from base10 import convert_base10_to_n, convert_n_to_base10
     from binarybases import (
         convert_base2_to_n,
@@ -11,33 +68,51 @@ def convert(number, base, target_base, animate=True, show_table=True):
     )
     
     if base == 10:
-        return convert_base10_to_n(number, target_base, animation=animate)
-       
-    if target_base == 10:
-       return convert_n_to_base10(number, base, animation=animate)
-        
-    if base == 2:
-        return convert_base2_to_n(number, target_base, animation=animate, show_table=show_table)
+        convert_base10_to_n(number, target_base, animation=animate)
+    elif target_base == 10:
+        convert_n_to_base10(number, base, animation=animate)
+    elif base == 2:
+        convert_base2_to_n(number, target_base, animation=animate, show_table=show_table)
+    elif target_base == 2:
+        convert_base_n_to_2(number, base, animation=animate, show_table=show_table)
+    elif base in [2, 4, 8, 16] and target_base in [2, 4, 8, 16]:
+        convert_base_n_to_n(number, base, target_base, animation=animate, show_table=show_table)
+    else:
+        raise ValueError("conversion between the specified bases is not supported.")
 
-    if target_base == 2:
-        return convert_base_n_to_2(number, base, animation=animate, show_table=show_table)
-
-    if base in [2, 4, 8, 16] and target_base in [2, 4, 8, 16]:
-        return convert_base_n_to_n(number, base, target_base, animation=animate, show_table=show_table)
-
-    raise ValueError("conversion between the specified bases is not supported.")
+    path = get_predicted_path("convert", **params)
+    if path:
+        cache[key] = path
+        save_cache(cache)
+    return path
 
 def logic_operation(a, b, base, operation, animate=True, show_table=True):
+    params = {"a": str(a), "b": str(b), "base": base, "operation": operation, "animate": animate, "show_table": show_table}
+    cache = load_cache()
+    key = get_cache_key("logic", **params)
+
+    if key in cache:
+        path = cache[key]
+        if os.path.exists(path):
+            print(f"Using cached result: {path}")
+            return path
+
     from logic import and_logic, or_logic, xor_logic
     
     if operation == "AND":
-        return and_logic(a, b, base, animation=animate, show_table=show_table)
+        and_logic(a, b, base, animation=animate, show_table=show_table)
     elif operation == "OR":
-        return or_logic(a, b, base, animation=animate, show_table=show_table)
+        or_logic(a, b, base, animation=animate, show_table=show_table)
     elif operation == "XOR":
-        return xor_logic(a, b, base, animation=animate, show_table=show_table)
+        xor_logic(a, b, base, animation=animate, show_table=show_table)
     else:
         raise ValueError("Unsupported operation. Use 'AND', 'OR', or 'XOR'.")
+
+    path = get_predicted_path("logic", **params)
+    if path:
+        cache[key] = path
+        save_cache(cache)
+    return path
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Base Converter and Logic Operations CLI")
