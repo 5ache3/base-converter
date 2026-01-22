@@ -38,62 +38,73 @@ cd base-convertor
 
 
 ##  Usage
-The main conversion logic is implemented in `main.py`.
-You can call the function:
-```py
-convert(number, from_base, to_base, animate=True, **options)
- ```
 
-### Example
+The project now features a CLI for easy interaction. You can perform base conversions and logic operations directly from your terminal.
 
-```py
-convert(1251, 10, 2, animate=True)
+### Base Conversion
+Convert numbers between any bases from 2 to 16.
+
+**Syntax:**
+```bash
+python main.py convert <number> <source_base> <target_base> [options]
 ```
-### Output (Example Animation)
-<video width="600" controls>
-  <source src="assets/1251-B10_to_B2.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
-```py
-convert(1251, 10, 2, animate=False)
+**Common Options:**
+- `--no-animate`: Skip the animation and produce an image instead.
+- `--no-table`: Hide the conversion/truth table.
+
+**Example:**
+```bash
+python main.py convert 1251 10 2
 ```
-### Output :
 
-![Alt text describing the image](assets/1251-B10_to_B2.png)
+### Logic Operations
+Perform bitwise logic operations (`AND`, `OR`, `XOR`) on two numbers.
 
-```py
-convert("3F1B",16,10,animate=False)
+**Syntax:**
+```bash
+python main.py logic <a> <b> <base> <operation> [options]
 ```
-### Output :
 
-![Alt text describing the image](assets/3F1B-B16_to_B10.png)
-
-
-## ■ Logic Operations Examples
-```py
-logic_operation("76F2","543F",16,"OR",animate=False)
+**Example:**
+```bash
+python main.py logic 76F2 543F 16 OR --no-animate
 ```
-### Output :
-    
-![Alt text describing the image](assets/OR76F2-543F-B16.png)
 
-```py
-logic_operation("762","543",10,"AND",animate=False,show_table=False)
+---
+
+## ⚡ Caching System
+
+To avoid redundant rendering, the project includes an automatic caching system.
+- Computed scenes (videos or images) are tracked in `scene_cache.json`.
+- If you run a command with parameters that have already been computed, the CLI will skip rendering and return the path to the existing file.
+- If an output file is deleted, the cache will automatically re-render it on the next run.
+
+---
+
+##  Examples
+
+### Base Conversion (Decimal to Binary)
+```bash
+python main.py convert 1251 10 2
 ```
-### Output :
-    
-![Alt text describing the image](assets/AND762-543-B10.png)
+![1251-B10_to_B2](assets/1251-B10_to_B2.png)
 
-```py
-logic_operation("101101","110011",2,"XOR",animate=False,show_table=False)
+### Hexadecimal Conversion
+```bash
+python main.py convert 3F1B 16 10 --no-animate
 ```
-### Output :
-    
-![Alt text describing the image](assets/XOR1001011-101110-B2.png)
+![3F1B-B16_to_B10](assets/3F1B-B16_to_B10.png)
 
+### Logic Operation (OR in Hex)
+```bash
+python main.py logic 76F2 543F 16 OR --no-animate
+```
+![OR76F2-543F-B16](assets/OR76F2-543F-B16.png)
+
+---
 
 ##  Inspiration
-Created to help students and educationers to visualize base conversion algorithms and binary logic in an intuitive and interactive way 
+Created to help students and educators visualize base conversion algorithms and binary logic in an intuitive and interactive way.
 
 **Made with love for math, logic, and visualization 🙃.**
