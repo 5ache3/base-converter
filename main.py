@@ -1,6 +1,10 @@
-from base10 import convert_base10_to_n,convert_n_to_base10
-from binarybases import convert_base2_to_n,convert_base_n_to_2,convert_base_n_to_n
-from logic import and_logic,or_logic,xor_logic
+from base10 import convert_base10_to_n, convert_n_to_base10
+from binarybases import (
+    convert_base2_to_n,
+    convert_base_n_to_2,
+    convert_base_n_to_n,
+)
+from logic import and_logic, or_logic, xor_logic
 
 def convert(number,base,target_base,animate=True,show_table=True):
     if base == 10:

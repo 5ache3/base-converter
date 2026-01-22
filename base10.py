@@ -1,4 +1,15 @@
-from manimlib import *
+import os
+
+from manimlib.constants import *
+from manimlib.scene.scene import Scene
+from manimlib.mobject.types.vectorized_mobject import VGroup
+from manimlib.mobject.geometry import Line, Arrow, SurroundingRectangle
+from manimlib import Tex
+
+# --- Animations ---
+from manimlib.animation.creation import ShowCreation
+from manimlib.animation.fading import FadeIn, FadeOut
+from manimlib.animation.transform import TransformFromCopy, TransformMatchingStrings
 
 def n_2_c(num):
     d={
@@ -178,9 +189,9 @@ class TentoN(Scene):
                 self.add(res)
             result[-1].add(res)
             buff+=.15
-        closing=Tex(f")_{{{base}}}").move_to(result[2].get_center()+RIGHT*(buff+0.15))
+        closing=Tex(f")_{{{base}}}").move_to(result[2].get_right()+RIGHT*0.25)
         result.add(closing)
-
+        
         if animate:
             self.play(FadeOut(main_group),FadeOut(VGroup(arrow,boxes)))
             frame=self.frame
@@ -289,7 +300,6 @@ def convert_base10_to_n(num,base,animation=True):
     scene = TentoN(num,base,animate=animation)
     scene.run()
     if not animation:
-        import os
         if not os.path.exists("images"):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B10_to_B{base}.png")
@@ -298,12 +308,11 @@ def convert_n_to_base10(num,base,animation=True):
     scene = NtoTen(num,base,animate=animation)
     scene.run()
     if not animation:
-        import os
         if not os.path.exists("images"):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B{base}_to_B10.png")
 
 
 if __name__ == "__main__":
-    # convert_base10_to_n(989,2,animation=False)
-    convert_n_to_base10(oct(7121),8,animation=False)
+    convert_base10_to_n(25,2,animation=False)
+    # convert_n_to_base10(25,8,animation=False)

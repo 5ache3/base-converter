@@ -1,4 +1,17 @@
-from manimlib import *
+import os
+
+from manimlib.constants import *
+from manimlib.scene.scene import Scene
+from manimlib.mobject.types.vectorized_mobject import VGroup
+from manimlib.mobject.geometry import SurroundingRectangle
+from manimlib.mobject.svg.text_mobject import Text
+from manimlib import Tex
+
+# --- Animations ---
+from manimlib.animation.creation import Write
+from manimlib.animation.fading import FadeIn, FadeOut
+from manimlib.animation.transform import TransformMatchingParts, TransformMatchingShapes
+from manimlib.animation.indication import Indicate
 
 def get_label_string(bin):
     n=len(bin)
@@ -353,7 +366,6 @@ def convert_base2_to_n(num,base,animation=True,show_table=True):
     scene = Frombase2(num,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
-        import os
         if not os.path.exists("images"):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B2_to_B{base}.png")
@@ -363,7 +375,6 @@ def convert_base_n_to_2(num,base,animation=True,show_table=True):
     scene = Tobase2(num,base,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
-        import os
         if not os.path.exists("images"):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B{base}_to_B2.png")
@@ -372,7 +383,6 @@ def convert_base_n_to_n(num,base1,base2,animation=True,show_table=True):
     scene = InterBase2(num,base1,base2,animate=animation,show_table=show_table)
     scene.run()
     if not animation:
-        import os
         if not os.path.exists("images"):
             os.makedirs("images")
         scene.get_image().save(f"images/{num}-B{base1}_to_B{base2}.png")
